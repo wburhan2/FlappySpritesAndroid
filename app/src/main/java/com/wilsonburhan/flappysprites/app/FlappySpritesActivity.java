@@ -1,42 +1,74 @@
 package com.wilsonburhan.flappysprites.app;
 
-import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 
 public class FlappySpritesActivity extends Activity {
 
     FlappySpriteSprite mView;
-    RelativeLayout mLinearLayout;
     static TextView mScoreBoard;
-    RelativeLayout.LayoutParams lp;
+    static Button mRestart;
+    static TextView mHighScore;
+    static TextView mNewHighScore;
+    static Button mShare;
+
+    static SharedPreferences sharedPreferences;
+    static SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mView = new FlappySpriteSprite(this);
-        mLinearLayout = new RelativeLayout(this);
-        mScoreBoard = new TextView(this);
-        mScoreBoard.setTextSize(25);
-        mScoreBoard.setGravity(Gravity.CENTER);
-        lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        lp.topMargin = 100;
-        mScoreBoard.setLayoutParams(lp);
-        mLinearLayout.addView(mView);
-        mLinearLayout.addView(mScoreBoard);
-        setContentView(mLinearLayout);
-        mScoreBoard.setText("0");
-    }
+        setContentView(R.layout.flappy_sprites_activity);
 
+        mView = (FlappySpriteSprite)findViewById(R.id.sprite);
+        mScoreBoard = (TextView)findViewById(R.id.score_board);
+
+        mHighScore = (TextView)findViewById(R.id.high_score);
+        mNewHighScore = (TextView)findViewById(R.id.new_high_score);
+        mRestart = (Button)findViewById(R.id.restart_button);
+        mShare = (Button)findViewById(R.id.share);
+        mHighScore.setVisibility(View.GONE);
+        mNewHighScore.setVisibility(View.GONE);
+        mRestart.setVisibility(View.GONE);
+        mShare.setVisibility(View.GONE);
+
+        sharedPreferences = getSharedPreferences("high_score", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        mHighScore.setText("Best -" + Integer.toString(FlappySpritesActivity.sharedPreferences.getInt("high_score", 0)));
+        mRestart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), FlappySpritesActivity.class);
+                mRestart.setVisibility(View.GONE);
+                mHighScore.setVisibility(View.GONE);
+                mNewHighScore.setVisibility(View.GONE);
+                mShare.setVisibility(View.GONE);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        mShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.setType("text/plain");
+                share.putExtra(Intent.EXTRA_TEXT, "Check out my high score!" + Integer.toString(sharedPreferences.getInt("high_score", 0)));
+                startActivity(Intent.createChooser(share, "Share your score!"));
+            }
+        });
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -48,20 +80,9 @@ public class FlappySpritesActivity extends Activity {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            mView.posY -= 50;
+            FlappySpriteSprite.posY -= 50;
+            FlappySpriteSprite.mVelocity = -10;
         }
         return super.onTouchEvent(event);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }
