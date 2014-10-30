@@ -14,19 +14,18 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
-public class FlappySpritesActivity extends Activity {
+public class FlappySpritesActivity extends Activity{
 
-    FlappySpriteSprite mView;
-    static TextView mScoreBoard;
-    static Button mRestart;
-    static TextView mHighScore;
-    static TextView mNewHighScore;
-    static Button mShare;
+    private FlappySpriteSprite mView;
+    public static TextView mScoreBoard;
+    public static Button mRestart;
+    public static TextView mHighScore;
+    public static TextView mNewHighScore;
+    public static Button mShare;
 
-    static SharedPreferences sharedPreferences;
-    static SharedPreferences.Editor editor;
-    static SoundPool sp;
-    static int[] soundPoolIds= new int[5];
+    public static SharedPreferences sharedPreferences;
+    public static SoundPool sp;
+    public static int[] soundPoolIds= new int[5];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +57,7 @@ public class FlappySpritesActivity extends Activity {
         soundPoolIds[3] = sp.load(this, R.raw.sfx_die, 1);
 
         sharedPreferences = getSharedPreferences("high_score", MODE_PRIVATE);
-        editor = sharedPreferences.edit();
-        mHighScore.setText("Best -" + Integer.toString(FlappySpritesActivity.sharedPreferences.getInt("high_score", 0)));
+        mHighScore.setText("Best -" + Integer.toString(sharedPreferences.getInt("high_score", 0)));
         mRestart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,8 +93,8 @@ public class FlappySpritesActivity extends Activity {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            FlappySpriteSprite.posY -= 50;
-            FlappySpriteSprite.mVelocity = -10;
+            mView.setPosY(mView.getPosY() - 50);
+            mView.setVelocity(-10);
             sp.play(soundPoolIds[2], 1, 1, 1, 0, 1.0f);
         }
         return super.onTouchEvent(event);
