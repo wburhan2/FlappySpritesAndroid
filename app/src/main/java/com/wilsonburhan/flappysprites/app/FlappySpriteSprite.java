@@ -122,6 +122,7 @@ public class FlappySpriteSprite extends View {
                     mScore++;
                     FlappySpritesActivity.mScoreBoard.setText(Integer.toString(mScore));
                     mSubScore = 0;
+                    FlappySpritesActivity.sp.play(FlappySpritesActivity.soundPoolIds[1], 1, 1, 1, 0, 1.0f);
                 }
             }else {
                 mLose = true;
@@ -137,6 +138,7 @@ public class FlappySpriteSprite extends View {
                 FlappySpritesActivity.editor.commit();
                 FlappySpritesActivity.mNewHighScore.setVisibility(View.VISIBLE);
             }
+            FlappySpritesActivity.sp.play(FlappySpritesActivity.soundPoolIds[0], 1, 1, 1, 0, 1.0f);
         }
         else
             invalidate();

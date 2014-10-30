@@ -25,6 +25,8 @@ public class FlappySpritesActivity extends Activity {
 
     static SharedPreferences sharedPreferences;
     static SharedPreferences.Editor editor;
+    static SoundPool sp;
+    static int[] soundPoolIds= new int[5];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,18 @@ public class FlappySpritesActivity extends Activity {
         mRestart.setVisibility(View.GONE);
         mShare.setVisibility(View.GONE);
 
+        /* Only for API 21+
+        sp = new SoundPool.Builder().
+                setMaxStreams(5).
+                setAudioAttributes(
+                        new AudioAttributes.Builder().
+                                setLegacyStreamType(AudioManager.STREAM_MUSIC).build()).build();*/
+        sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        soundPoolIds[0] = sp.load(this, R.raw.sfx_hit, 1);
+        soundPoolIds[1] = sp.load(this, R.raw.sfx_point, 1);
+        soundPoolIds[2] = sp.load(this, R.raw.sfx_wing, 1);
+        soundPoolIds[3] = sp.load(this, R.raw.sfx_die, 1);
+
         sharedPreferences = getSharedPreferences("high_score", MODE_PRIVATE);
         editor = sharedPreferences.edit();
         mHighScore.setText("Best -" + Integer.toString(FlappySpritesActivity.sharedPreferences.getInt("high_score", 0)));
@@ -55,6 +69,7 @@ public class FlappySpritesActivity extends Activity {
                 mNewHighScore.setVisibility(View.GONE);
                 mShare.setVisibility(View.GONE);
                 startActivity(intent);
+                sp.play(soundPoolIds[3], 1, 1, 1, 0, 1.0f);
                 finish();
             }
         });
@@ -82,6 +97,7 @@ public class FlappySpritesActivity extends Activity {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             FlappySpriteSprite.posY -= 50;
             FlappySpriteSprite.mVelocity = -10;
+            sp.play(soundPoolIds[2], 1, 1, 1, 0, 1.0f);
         }
         return super.onTouchEvent(event);
     }
