@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     tools:context=".FlappySpritesActivity">
 
     <com.wilsonburhan.flappysprites.app.FlappySpriteSprite
@@ -14,7 +15,8 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:text="0"
-        android:paddingTop="50dp"
+        android:textColor="@color/white"
+        android:paddingTop="60dp"
         android:textSize="50sp"/>
     <Button
         android:id="@+id/restart_button"
@@ -45,7 +47,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="14dp"
-        android:text="New High Score!"
+        android:layout_marginTop="5dp"
+        android:text="@string/new_high_Score"
+        android:textColor="@color/green"
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 </RelativeLayout>

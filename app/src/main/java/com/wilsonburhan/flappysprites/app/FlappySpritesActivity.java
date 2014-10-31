@@ -77,7 +77,7 @@ public class FlappySpritesActivity extends Activity{
             public void onClick(View v) {
                 Intent share = new Intent(Intent.ACTION_SEND);
                 share.setType("text/plain");
-                share.putExtra(Intent.EXTRA_TEXT, "Check out my high score!" + Integer.toString(sharedPreferences.getInt("high_score", 0)));
+                share.putExtra(Intent.EXTRA_TEXT, "Check out my high score! You jelly bro? " + Integer.toString(sharedPreferences.getInt("high_score", 0)));
                 startActivity(Intent.createChooser(share, "Share your score!"));
             }
         });
