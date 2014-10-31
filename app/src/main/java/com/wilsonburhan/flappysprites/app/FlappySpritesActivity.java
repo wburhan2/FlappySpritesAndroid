@@ -3,7 +3,6 @@ package com.wilsonburhan.flappysprites.app;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
@@ -13,19 +12,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-
 public class FlappySpritesActivity extends Activity{
 
     private FlappySpriteSprite mView;
-    public static TextView mScoreBoard;
-    public static Button mRestart;
-    public static TextView mHighScore;
-    public static TextView mNewHighScore;
-    public static Button mShare;
+    private TextView mScoreBoard;
+    private Button mRestart;
+    private TextView mHighScore;
+    private TextView mNewHighScore;
+    private Button mShare;
 
-    public static SharedPreferences sharedPreferences;
-    public static SoundPool sp;
-    public static int[] soundPoolIds= new int[5];
+    private SharedPreferences sharedPreferences;
+    private SoundPool sp;
+    private int[] soundPoolIds= new int[5];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +37,8 @@ public class FlappySpritesActivity extends Activity{
         mNewHighScore = (TextView)findViewById(R.id.new_high_score);
         mRestart = (Button)findViewById(R.id.restart_button);
         mShare = (Button)findViewById(R.id.share);
-        mHighScore.setVisibility(View.GONE);
-        mNewHighScore.setVisibility(View.GONE);
-        mRestart.setVisibility(View.GONE);
-        mShare.setVisibility(View.GONE);
+
+        init();
 
         /* Only for API 21+
         sp = new SoundPool.Builder().
@@ -58,29 +54,8 @@ public class FlappySpritesActivity extends Activity{
 
         sharedPreferences = getSharedPreferences("high_score", MODE_PRIVATE);
         mHighScore.setText("Best -" + Integer.toString(sharedPreferences.getInt("high_score", 0)));
-        mRestart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), FlappySpritesActivity.class);
-                mRestart.setVisibility(View.GONE);
-                mHighScore.setVisibility(View.GONE);
-                mNewHighScore.setVisibility(View.GONE);
-                mShare.setVisibility(View.GONE);
-                startActivity(intent);
-                sp.play(soundPoolIds[3], 1, 1, 1, 0, 1.0f);
-                finish();
-            }
-        });
 
-        mShare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent share = new Intent(Intent.ACTION_SEND);
-                share.setType("text/plain");
-                share.putExtra(Intent.EXTRA_TEXT, "Check out my high score! You jelly bro? " + Integer.toString(sharedPreferences.getInt("high_score", 0)));
-                startActivity(Intent.createChooser(share, "Share your score!"));
-            }
-        });
+        helper();
     }
 
     @Override
@@ -98,5 +73,65 @@ public class FlappySpritesActivity extends Activity{
             sp.play(soundPoolIds[2], 1, 1, 1, 0, 1.0f);
         }
         return super.onTouchEvent(event);
+    }
+
+    private void init(){
+        mHighScore.setVisibility(View.GONE);
+        mNewHighScore.setVisibility(View.GONE);
+        mRestart.setVisibility(View.GONE);
+        mShare.setVisibility(View.GONE);
+    }
+
+    private void helper(){
+        // Restart button
+        mRestart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), FlappySpritesActivity.class);
+                mRestart.setVisibility(View.GONE);
+                mHighScore.setVisibility(View.GONE);
+                mNewHighScore.setVisibility(View.GONE);
+                mShare.setVisibility(View.GONE);
+                startActivity(intent);
+                sp.play(soundPoolIds[3], 1, 1, 1, 0, 1.0f);
+                finish();
+            }
+        });
+
+        // Share button
+        mShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.setType("text/plain");
+                share.putExtra(Intent.EXTRA_TEXT, "Check out my high score! You jelly bro? " + Integer.toString(sharedPreferences.getInt("high_score", 0)));
+                startActivity(Intent.createChooser(share, "Share your score!"));
+            }
+        });
+
+        // Listener
+        mView.setGameListener(new IGameListener() {
+            @Override
+            public void onScoreUpdate() {
+                mScoreBoard.setText(Integer.toString(mView.score));
+                sp.play(soundPoolIds[1], 1, 1, 1, 0, 1.0f);
+            }
+
+            @Override
+            public void onGameEnd() {
+                mRestart.setVisibility(View.VISIBLE);
+                mHighScore.setVisibility(View.VISIBLE);
+                mShare.setVisibility(View.VISIBLE);
+                sp.play(soundPoolIds[0], 1, 1, 1, 0, 1.0f);
+
+
+                if (sharedPreferences.getInt("high_score", 0) < mView.score) {
+                    SharedPreferences.Editor edit = sharedPreferences.edit();
+                    edit.putInt("high_score", mView.score);
+                    edit.commit();
+                    mNewHighScore.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 }

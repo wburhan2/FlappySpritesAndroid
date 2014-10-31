@@ -15,8 +15,9 @@ import java.util.Random;
 /**
  * Created by Wilson on 10/27/14.
  */
-public class FlappySpriteSprite extends View {
+public class FlappySpriteSprite extends View{
 
+    // Fields
     private final int BLOCK_WIDTH = 200;
     private final int GROUND_HEIGHT = 200;
     private final int SUBPOINT = 61;
@@ -27,7 +28,7 @@ public class FlappySpriteSprite extends View {
     private boolean mLose = false;
     private RectF sprite;
     private Random rand;
-    private int mScore = 0, mSubScore = 0;
+    public int score = 0, mSubScore = 0;
     public int velocity = 0;
     public int posY = 300;
     private int posX = 0;
@@ -35,6 +36,7 @@ public class FlappySpriteSprite extends View {
     private Rect mTopBlock, mBottomBlock, mGround, mMovingGround;
     private int height = 300;
     private Bitmap mBottomPipe, mTopPipe, mGroundImage, mSprite;
+    private IGameListener mGameListener;
 
     public FlappySpriteSprite(Context context, AttributeSet attribute) {
         super(context, attribute);
@@ -118,10 +120,11 @@ public class FlappySpriteSprite extends View {
                 sprite.top > mTopBlock.bottom) {
                 mSubScore++;
                 if (mSubScore == SUBPOINT) {
-                    mScore++;
-                    FlappySpritesActivity.mScoreBoard.setText(Integer.toString(mScore));
+                    score++;
+                    if (mGameListener != null) {
+                        mGameListener.onScoreUpdate();
+                    }
                     mSubScore = 0;
-                    FlappySpritesActivity.sp.play(FlappySpritesActivity.soundPoolIds[1], 1, 1, 1, 0, 1.0f);
                 }
             }else {
                 mLose = true;
@@ -129,16 +132,8 @@ public class FlappySpriteSprite extends View {
         }
 
         if (mLose) {
-            FlappySpritesActivity.mRestart.setVisibility(View.VISIBLE);
-            FlappySpritesActivity.mHighScore.setVisibility(View.VISIBLE);
-            FlappySpritesActivity.mShare.setVisibility(View.VISIBLE);
-            if (FlappySpritesActivity.sharedPreferences.getInt("high_score", 0) < mScore) {
-                SharedPreferences.Editor edit = FlappySpritesActivity.sharedPreferences.edit();
-                edit.putInt("high_score", mScore);
-                edit.commit();
-                FlappySpritesActivity.mNewHighScore.setVisibility(View.VISIBLE);
-            }
-            FlappySpritesActivity.sp.play(FlappySpritesActivity.soundPoolIds[0], 1, 1, 1, 0, 1.0f);
+            if (mGameListener != null)
+                mGameListener.onGameEnd();
         }
         else
             invalidate();
@@ -154,5 +149,9 @@ public class FlappySpriteSprite extends View {
 
     public void setVelocity(int velocity) {
         this.velocity = velocity;
+    }
+
+    public void setGameListener(IGameListener gameListener){
+        mGameListener = gameListener;
     }
 }
