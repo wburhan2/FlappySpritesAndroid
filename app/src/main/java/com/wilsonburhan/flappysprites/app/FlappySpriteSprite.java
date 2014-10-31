@@ -1,7 +1,6 @@
 package com.wilsonburhan.flappysprites.app;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -37,6 +36,7 @@ public class FlappySpriteSprite extends View{
     private int height = 300;
     private Bitmap mBottomPipe, mTopPipe, mGroundImage, mSprite;
     private IGameListener mGameListener;
+    public boolean isRunning;
 
     public FlappySpriteSprite(Context context, AttributeSet attribute) {
         super(context, attribute);
@@ -58,11 +58,19 @@ public class FlappySpriteSprite extends View{
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        sprite.set(canvas.getWidth() / 2 - 150,
-                posY - 150,
+        sprite.set(canvas.getWidth() / 2 - 130,
+                posY - 130,
                 canvas.getWidth() / 2,
                 posY);
         canvas.drawBitmap(mSprite, null, sprite, null);
+
+        mGround.set(-mGroundMovement,
+                canvas.getHeight() - 200,
+                canvas.getWidth() - mGroundMovement,
+                canvas.getHeight());
+        canvas.drawBitmap(mGroundImage, null, mGround, null);
+
+        if (isRunning) {
         /* ROTATE
         if (mVelocity < 0)
             canvas.rotate(-25, -50, -50);
@@ -72,71 +80,66 @@ public class FlappySpriteSprite extends View{
         canvas.drawBitmap(mSprite, null, oval, null);
         canvas.restore();
         */
-        velocity += ACCELERATION;
-        posY += velocity;
+            velocity += ACCELERATION;
+            posY += velocity;
 
-        mBottomBlock.set(canvas.getWidth() - posX,
-                        height + GAP,
-                        canvas.getWidth() - posX + BLOCK_WIDTH,
-                        height + GAP + IMAGE_HEIGHT);
+            mBottomBlock.set(canvas.getWidth() - posX,
+                    height + GAP,
+                    canvas.getWidth() - posX + BLOCK_WIDTH,
+                    height + GAP + IMAGE_HEIGHT);
 
-        canvas.drawBitmap(mBottomPipe, null, mBottomBlock, null);
+            canvas.drawBitmap(mBottomPipe, null, mBottomBlock, null);
 
-        mTopBlock.set(canvas.getWidth() - posX,
-                     height - IMAGE_HEIGHT,
-                     canvas.getWidth() - posX + BLOCK_WIDTH,
-                     height);
-        canvas.drawBitmap(mTopPipe, null, mTopBlock, null);
+            mTopBlock.set(canvas.getWidth() - posX,
+                    height - IMAGE_HEIGHT,
+                    canvas.getWidth() - posX + BLOCK_WIDTH,
+                    height);
+            canvas.drawBitmap(mTopPipe, null, mTopBlock, null);
 
-        mGround.set(-mGroundMovement,
-                canvas.getHeight() - 200,
-                canvas.getWidth() - mGroundMovement,
-                canvas.getHeight());
-        canvas.drawBitmap(mGroundImage, null, mGround, null);
-        mMovingGround.set(-mGroundMovement,
-                canvas.getHeight() - 200,
-                2 * canvas.getWidth() - mGroundMovement,
-                canvas.getHeight());
-        canvas.drawBitmap(mGroundImage, null, mMovingGround, null);
+            mMovingGround.set(-mGroundMovement,
+                    canvas.getHeight() - 200,
+                    2 * canvas.getWidth() - mGroundMovement,
+                    canvas.getHeight());
+            canvas.drawBitmap(mGroundImage, null, mMovingGround, null);
 
-        posX+= X_VELOCITY;
-        mGroundMovement++;
+            posX += X_VELOCITY;
+            mGroundMovement++;
 
-        if (mGroundMovement == canvas.getWidth())
-            mGroundMovement = 0;
+            if (mGroundMovement == canvas.getWidth())
+                mGroundMovement = 0;
 
-        if (posX == canvas.getWidth() + BLOCK_WIDTH){
-            posX = 0;
-            height = rand.nextInt(canvas.getHeight() - GAP - GROUND_HEIGHT);
-        }
-
-        if (sprite.bottom > canvas.getHeight() - GROUND_HEIGHT)
-            mLose = true;
-
-
-        if (sprite.right >= mBottomBlock.left &&
-            sprite.left <= mBottomBlock.right) {
-            if (sprite.bottom < mBottomBlock.top &&
-                sprite.top > mTopBlock.bottom) {
-                mSubScore++;
-                if (mSubScore == SUBPOINT) {
-                    score++;
-                    if (mGameListener != null) {
-                        mGameListener.onScoreUpdate();
-                    }
-                    mSubScore = 0;
-                }
-            }else {
-                mLose = true;
+            if (posX == canvas.getWidth() + BLOCK_WIDTH) {
+                posX = 0;
+                height = rand.nextInt(canvas.getHeight() - GAP - GROUND_HEIGHT);
             }
-        }
 
-        if (mLose) {
-            if (mGameListener != null)
-                mGameListener.onGameEnd();
+            if (sprite.bottom > canvas.getHeight() - GROUND_HEIGHT)
+                mLose = true;
+
+
+            if (sprite.right >= mBottomBlock.left &&
+                    sprite.left <= mBottomBlock.right) {
+                if (sprite.bottom < mBottomBlock.top &&
+                        sprite.top > mTopBlock.bottom) {
+                    mSubScore++;
+                    if (mSubScore == SUBPOINT) {
+                        score++;
+                        if (mGameListener != null) {
+                            mGameListener.onScoreUpdate();
+                        }
+                        mSubScore = 0;
+                    }
+                } else {
+                    mLose = true;
+                }
+            }
+
+            if (mLose) {
+                if (mGameListener != null)
+                    mGameListener.onGameEnd();
+            } else
+                invalidate();
         }
-        else
-            invalidate();
     }
 
     public void setPosY(int posY) {

@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class FlappySpritesActivity extends Activity{
@@ -20,10 +21,12 @@ public class FlappySpritesActivity extends Activity{
     private TextView mHighScore;
     private TextView mNewHighScore;
     private Button mShare;
+    private ImageView mTapToStart;
 
     private SharedPreferences sharedPreferences;
     private SoundPool sp;
     private int[] soundPoolIds= new int[5];
+    private boolean isRunning = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +40,7 @@ public class FlappySpritesActivity extends Activity{
         mNewHighScore = (TextView)findViewById(R.id.new_high_score);
         mRestart = (Button)findViewById(R.id.restart_button);
         mShare = (Button)findViewById(R.id.share);
+        mTapToStart = (ImageView)findViewById(R.id.tap_to_start);
 
         init();
 
@@ -59,18 +63,16 @@ public class FlappySpritesActivity extends Activity{
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.flappy_sprites, menu);
-        return true;
-    }
-
-    @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            mView.setPosY(mView.getPosY() - 50);
-            mView.setVelocity(-10);
-            sp.play(soundPoolIds[2], 1, 1, 1, 0, 1.0f);
+            if (isRunning) {
+                mView.isRunning = true;
+                mTapToStart.setVisibility(View.GONE);
+                mView.invalidate();
+                mView.setPosY(mView.getPosY() - 50);
+                mView.setVelocity(-10);
+                sp.play(soundPoolIds[2], 1, 1, 1, 0, 1.0f);
+            }
         }
         return super.onTouchEvent(event);
     }
@@ -124,6 +126,7 @@ public class FlappySpritesActivity extends Activity{
                 mShare.setVisibility(View.VISIBLE);
                 sp.play(soundPoolIds[0], 1, 1, 1, 0, 1.0f);
 
+                isRunning = false;
 
                 if (sharedPreferences.getInt("high_score", 0) < mView.score) {
                     SharedPreferences.Editor edit = sharedPreferences.edit();
