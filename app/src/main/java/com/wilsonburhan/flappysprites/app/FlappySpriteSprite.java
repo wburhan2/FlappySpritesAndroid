@@ -50,7 +50,7 @@ public class FlappySpriteSprite extends View{
         mTopPipe = BitmapFactory.decodeResource(getResources(), R.drawable.pipe_down);
         mGroundImage = BitmapFactory.decodeResource(getResources(), R.drawable.ground);
         mSprite = BitmapFactory.decodeResource(getResources(), R.drawable.sprite);
-        posY = 300;
+        posY = 600;
         velocity = 1;
     }
 
@@ -110,7 +110,7 @@ public class FlappySpriteSprite extends View{
 
             if (posX == canvas.getWidth() + BLOCK_WIDTH) {
                 posX = 0;
-                height = rand.nextInt(canvas.getHeight() - GAP - GROUND_HEIGHT);
+                height = rand.nextInt(canvas.getHeight() - GAP - GROUND_HEIGHT - 100);
             }
 
             if (sprite.bottom > canvas.getHeight() - GROUND_HEIGHT)
