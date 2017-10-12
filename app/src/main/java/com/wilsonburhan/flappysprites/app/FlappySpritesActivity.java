@@ -6,15 +6,11 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.ironsource.mobilcore.CallbackResponse;
-import com.ironsource.mobilcore.MobileCore;
 
 public class FlappySpritesActivity extends Activity{
 
@@ -62,8 +58,6 @@ public class FlappySpritesActivity extends Activity{
         sharedPreferences = getSharedPreferences("high_score", MODE_PRIVATE);
         mHighScore.setText("Best -" + Integer.toString(sharedPreferences.getInt("high_score", 0)));
 
-        MobileCore.init(this,"2K3GZ5GPPKNGFNRAI4FA39AOKQSMU", MobileCore.LOG_TYPE.PRODUCTION, MobileCore.AD_UNITS.INTERSTITIAL);
-
         helper();
     }
 
@@ -80,21 +74,6 @@ public class FlappySpritesActivity extends Activity{
             }
         }
         return super.onTouchEvent(event);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (getFragmentManager().getBackStackEntryCount() == 0 && MobileCore.isInterstitialReady()) {
-            MobileCore.showInterstitial(this, new CallbackResponse() {
-                @Override
-                public void onConfirmation(CallbackResponse.TYPE type)
-                {
-                    finish();
-                }});
-        }
-        else {
-            super.onBackPressed();
-        }
     }
 
     private void init(){

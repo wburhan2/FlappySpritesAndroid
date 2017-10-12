@@ -1,1 +1,15 @@
-/build
+.DS_Store
+.gradle/
+/local.properties
+.idea/
+*.iml/
+*.apk
+build.gradle
+*.ap_
+bin/
+gen/
+build/
+mapping.txt
+seeds.txt
+unused.txt
+*.log
